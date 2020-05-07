@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 # Create Flask application
@@ -19,7 +19,17 @@ class Todo(db.Model):
 # Sync model with database 
 db.create_all()
 
-# Create route 
+# Create todos create route 
+@app.route('/todos/create', methods=['POST'])
+def create_todo():
+    description = request.form.get('description', '')
+    # use description to create new todo object 
+    todo = Todo(description=description)
+    db.session.add(todo) # adds but doesnt commit
+    db.session.commit()
+    return redirect(url_for('index'))
+
+# Create index route 
 @app.route('/')
 def index():
     return render_template('index.html', data=Todo.query.all())
