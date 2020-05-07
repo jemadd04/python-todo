@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
+import sys
 
 # Create Flask application
 app = Flask(__name__)
@@ -19,15 +20,26 @@ class Todo(db.Model):
 # Sync model with database 
 db.create_all()
 
-# Create todos create route 
+# Get JSON that comes back from AJAX request
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
-    description = request.form.get('description', '')
-    # use description to create new todo object 
-    todo = Todo(description=description)
-    db.session.add(todo) # adds but doesnt commit
-    db.session.commit()
-    return redirect(url_for('index'))
+    error = False
+    body = {}
+    try:
+        description = request.get_json()['description']
+        # use description to create new todo object 
+        todo = Todo(description=description)
+        db.session.add(todo) # adds but doesnt commit
+        db.session.commit()
+        body['description'] = todo.description
+    except:
+        error = True
+        db.session.rollback()
+        print(sys.exc_info()) 
+    finally:
+        db.session.close()
+    if not error:
+        return jsonify(body)
 
 # Create index route 
 @app.route('/')
