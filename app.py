@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 import sys
 
 # Create Flask application
@@ -9,16 +10,20 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://James@localhost:5432/todoapp
 # Link SQLAlchemy to Flask app 
 db = SQLAlchemy(app)
 
+# Set up flask migrate so we can use flask migrate commands
+migrate = Migrate(app, db)
+
 class Todo(db.Model):
     __tablename__ = 'todos'
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(), nullable=False)
+    completed = db.Column(db.Boolean, nullable=False, default=False)
 
     def __repr__(self):
         return f'<Todo {self.id} {self.description}>'
 
-# Sync model with database 
-db.create_all()
+# Sync model with database. Since we implemented migrations, we no longer need this so I commented it out 
+# db.create_all()
 
 # Get JSON that comes back from AJAX request
 @app.route('/todos/create', methods=['POST'])
