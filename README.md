@@ -14,3 +14,4 @@
 * Getting user data in Flash through forms, URL query parameters, or JSON (in this project we used forms)
 * Using AJAX to send data to Flask asynchronously through XMLHttpRequest or Fetch (in this project we used Fetch)
 * Using sessions in controllers (try-except-finally)
+* Migrations using Flask-Migration
